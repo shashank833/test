@@ -24,6 +24,9 @@ call ReadConfig
    autECLSession.autECLPS.SendKeys Password    'Login Password
    end Sub
 Sub ReadConfig()
+Const adOpenStatic = 3
+    Const adLockOptimistic = 3
+    Const adCmdText = 512
     Set objConnection1 = CreateObject("ADODB.Connection")
     Set objrecordset = CreateObject("ADODB.Recordset")
     objConnection1.Open "Provider=Microsoft.Jet.OLEDB.4.0;" & _
