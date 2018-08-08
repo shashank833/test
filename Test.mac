@@ -1,0 +1,159 @@
+[PCOMM SCRIPT HEADER]
+Language = VBSCRIPT
+DESCRIPTION=
+[PCOMM SCRIPT SOURCE]
+Option Explicit
+autECLSession.SetConnectionByName (ThisSessionName)
+Rem This line calls the macro subroutine
+
+main
+dim objConnection1,objConnection2
+dim objrecordset1,objrecordset2
+dim Password 
+dim UserName 
+Const adOpenStatic = 3
+Const adLockOptimistic = 3
+Const adCmdText = 512
+Sub main()
+	call ReadConfig_Credentials
+	call Login
+	call Library_Selection
+	call Read_PolicyCreation	
+End Sub
+
+
+   
+Sub ReadConfig_Credentials()
+	dim filepath
+	filepath="Z:\Madan\Madan\Input_Macro\Credentials.xls"
+    Set objConnection1 = CreateObject("ADODB.Connection")
+    Set objrecordset1 = CreateObject("ADODB.Recordset")
+    objConnection1.Open "Provider=Microsoft.Jet.OLEDB.4.0;" & _
+    "Data Source=" & filepath & ";" & _
+    "Extended Properties=""Excel 8.0;HDR=Yes;"";"
+	objrecordset1.Open "Select * FROM [" & "Sheet1" & "$]", _
+    objConnection1, adOpenStatic, adLockOptimistic, adCmdText
+	UserName = objrecordset1.Fields.Item("USERNAME")
+	password = objrecordset1.Fields.Item("PASSWORD")
+	MsgBox ("User Name is " &UserName)
+	objrecordset1.Close
+	objConnection1.Close
+end Sub
+
+Sub Read_PolicyCreation()
+	dim filepath, objConnection2, objrecordset2, Mainmenu,Submenu, ApplicationOption, AssignNewPolicyOption, AssuredName, AgentCode, POLICYCCY, PLANCODE 
+	Const adOpenStatic = 3
+    Const adLockOptimistic = 3
+    Const adCmdText = 512
+	filepath="Z:\Madan\Madan\Input_Macro\Policy Number Assignment.xls"
+    Set objConnection2 = CreateObject("ADODB.Connection")
+    Set objrecordset2 = CreateObject("ADODB.Recordset")
+    objConnection2.Open "Provider=Microsoft.Jet.OLEDB.4.0;" & _
+    "Data Source=" & filepath & ";" & _
+    "Extended Properties=""Excel 8.0;HDR=Yes;"";"
+	objrecordset2.Open "Select * FROM [" & "Sheet1" & "$]", _
+    objConnection2, adOpenStatic, adLockOptimistic, adCmdText
+
+	autECLSession.autECLOIA.WaitForAppAvailable
+	'autECLSession.autECLOIA.WaitForInputReady
+	autECLSession.autECLOIA.WaitForInputReady
+    autECLSession.autECLPS.SetCursorPos 23,12
+    autECLSession.autECLOIA.WaitForInputReady
+    autECLSession.autECLPS.SendKeys objrecordset2.Fields.Item("Main Menu")
+    autECLSession.autECLPS.SendKeys "[enter]"
+    autECLSession.autECLOIA.WaitForInputReady
+    autECLSession.autECLPS.SetCursorPos 23,12
+    autECLSession.autECLOIA.WaitForInputReady
+    autECLSession.autECLPS.SendKeys objrecordset2.Fields.Item("Sub Menu")
+    autECLSession.autECLPS.SendKeys "[enter]"
+	
+    autECLSession.autECLOIA.WaitForAppAvailable
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SetCursorPos 4,29
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys objrecordset2.Fields.Item("Application Option")
+   autECLSession.autECLPS.SendKeys "[enter]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SetCursorPos 11,38
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys objrecordset2.Fields.Item("Assign New Policy Option")
+   autECLSession.autECLPS.SendKeys "[enter]"
+   Do until objrecordset2.EOF
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SetCursorPos 7,38
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys objrecordset2.Fields.Item("Assured Name")
+   autECLSession.autECLPS.SetCursorPos 11,38
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys objrecordset2.Fields.Item("Agent Code")
+   autECLSession.autECLPS.SetCursorPos 16,38
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys objrecordset2.Fields.Item("POLICY CCY")
+   autECLSession.autECLPS.SetCursorPos 17,38
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys objrecordset2.Fields.Item("PLAN CODE")
+   
+   autECLSession.autECLPS.SendKeys "[enter]"
+   MsgBox ""
+   autECLSession.autECLPS.SendKeys "[enter]"
+	objrecordset2.MoveNext
+	Loop
+
+end Sub
+
+
+Sub Login()
+
+   autECLSession.autECLOIA.WaitForAppAvailable
+   autECLSession.autECLPS.SetCursorPos 6,53
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys UserName    'Login User name
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SetCursorPos 7,53
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys Password    'Login Password
+   autECLSession.autECLPS.SendKeys "[enter]"
+   autECLSession.autECLPS.SendKeys "[enter]"
+   autECLSession.autECLPS.SendKeys "[enter]"
+end Sub
+
+sub Library_Selection()
+   autECLSession.autECLOIA.WaitForAppAvailable
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[roll up]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[roll up]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[roll up]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[roll up]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[roll up]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[roll up]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[roll up]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[down]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[down]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[down]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[down]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[down]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[down]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[down]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[down]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[down]"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "x"
+   autECLSession.autECLOIA.WaitForInputReady
+   autECLSession.autECLPS.SendKeys "[enter]"
+end sub
+
